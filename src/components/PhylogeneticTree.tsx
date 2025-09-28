@@ -9,8 +9,11 @@ import {
   RotateCcw, 
   Search,
   Info,
-  Dna
+  Dna,
+  Play,
+  Pause
 } from 'lucide-react';
+import OceanLifeBackground from './OceanLifeBackground';
 
 interface TreeNode {
   id: string;
@@ -26,7 +29,9 @@ const PhylogeneticTree: React.FC = () => {
   const [selectedNode, setSelectedNode] = useState<TreeNode | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationRef = useRef<number>();
 
   // Mock phylogenetic data
   const treeData: TreeNode = {
@@ -124,7 +129,7 @@ const PhylogeneticTree: React.FC = () => {
     ]
   };
 
-  const drawTree = () => {
+  const drawTree = (time: number = 0) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -136,77 +141,179 @@ const PhylogeneticTree: React.FC = () => {
     canvas.height = canvas.offsetHeight * window.devicePixelRatio;
     ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
 
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
+    // Clear canvas with ocean gradient background
+    const gradient = ctx.createRadialGradient(
+      canvas.offsetWidth / 2, canvas.offsetHeight / 2, 0,
+      canvas.offsetWidth / 2, canvas.offsetHeight / 2, Math.max(canvas.offsetWidth, canvas.offsetHeight)
+    );
+    gradient.addColorStop(0, 'hsl(215, 100%, 12%)');
+    gradient.addColorStop(0.5, 'hsl(218, 100%, 8%)');
+    gradient.addColorStop(1, 'hsl(220, 100%, 4%)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
 
     // Apply zoom
+    ctx.save();
     ctx.scale(zoomLevel, zoomLevel);
 
-    // Draw tree recursively
-    const drawNode = (node: TreeNode, x: number, y: number, level: number) => {
-      const radius = 6 + (level * 2);
-      const color = node.novelSpecies 
-        ? 'hsl(var(--bio-cyan))' 
-        : level === 0 
-          ? 'hsl(var(--bio-teal))' 
-          : 'hsl(var(--bio-green))';
-
-      // Draw node
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, 2 * Math.PI);
-      ctx.fillStyle = color;
-      ctx.fill();
-      
-      // Add glow effect for novel species
-      if (node.novelSpecies) {
-        ctx.shadowColor = color;
-        ctx.shadowBlur = 15;
+    // Draw animated background particles
+    if (isPlaying) {
+      for (let i = 0; i < 30; i++) {
+        const particleX = (Math.sin(time * 0.001 + i * 0.5) * 50) + (i % 10) * (canvas.offsetWidth / 10);
+        const particleY = (Math.cos(time * 0.0005 + i * 0.3) * 30) + (Math.floor(i / 10)) * (canvas.offsetHeight / 3);
+        
+        ctx.beginPath();
+        ctx.arc(particleX, particleY, 2, 0, 2 * Math.PI);
+        ctx.fillStyle = `hsl(184, 100%, 50%, ${0.3 + Math.sin(time * 0.002 + i) * 0.2})`;
+        ctx.fill();
+        
+        // Glow effect
+        ctx.shadowColor = 'hsl(184, 100%, 50%)';
+        ctx.shadowBlur = 10;
         ctx.fill();
         ctx.shadowBlur = 0;
       }
+    }
 
-      // Draw label
-      ctx.fillStyle = 'hsl(var(--foreground))';
-      ctx.font = `${10 + level}px Inter`;
-      ctx.fillText(node.name, x + radius + 5, y + 3);
+    // Draw tree recursively with enhanced visuals
+    const drawNode = (node: TreeNode, x: number, y: number, level: number, animationProgress: number = 1) => {
+      const baseRadius = 8;
+      const radius = baseRadius + (level * 3) + (isPlaying ? Math.sin(time * 0.003 + level) * 2 : 0);
+      
+      const colors = {
+        novel: `hsl(184, 100%, 50%, ${0.8 + Math.sin(time * 0.002) * 0.2})`,
+        root: `hsl(174, 100%, 45%, ${0.8 + Math.sin(time * 0.002) * 0.2})`,
+        branch: `hsl(158, 100%, 40%, ${0.7 + Math.sin(time * 0.002) * 0.15})`,
+        default: `hsl(195, 100%, 55%, ${0.6 + Math.sin(time * 0.002) * 0.1})`
+      };
+      
+      const color = node.novelSpecies 
+        ? colors.novel
+        : level === 0 
+          ? colors.root 
+          : level === 1
+            ? colors.branch
+            : colors.default;
 
-      // Draw connections to children
+      // Draw connection lines first (with animated glow)
       if (node.children) {
         const childSpacing = 120;
-        const startX = x + 100;
+        const startX = x + 120;
         const childY = y - ((node.children.length - 1) * childSpacing) / 2;
 
         node.children.forEach((child, index) => {
           const childX = startX;
           const childYPos = childY + (index * childSpacing);
 
-          // Draw connection line
+          // Animated connection line
           ctx.beginPath();
           ctx.moveTo(x + radius, y);
           ctx.lineTo(childX - radius, childYPos);
-          ctx.strokeStyle = 'hsl(var(--border))';
-          ctx.lineWidth = 2;
+          
+          // Create flowing energy effect
+          const gradient = ctx.createLinearGradient(x + radius, y, childX - radius, childYPos);
+          const flowOffset = isPlaying ? (time * 0.005) % 1 : 0;
+          gradient.addColorStop(0, 'hsl(184, 100%, 50%, 0.3)');
+          gradient.addColorStop(flowOffset, 'hsl(174, 100%, 45%, 0.8)');
+          gradient.addColorStop(1, 'hsl(158, 100%, 40%, 0.3)');
+          
+          ctx.strokeStyle = gradient;
+          ctx.lineWidth = 3;
+          ctx.shadowColor = 'hsl(184, 100%, 50%)';
+          ctx.shadowBlur = 8;
           ctx.stroke();
+          ctx.shadowBlur = 0;
 
           // Recursively draw child
-          drawNode(child, childX, childYPos, level + 1);
+          drawNode(child, childX, childYPos, level + 1, animationProgress);
         });
+      }
+
+      // Draw node with enhanced effects
+      ctx.beginPath();
+      ctx.arc(x, y, radius * animationProgress, 0, 2 * Math.PI);
+      ctx.fillStyle = color;
+      ctx.fill();
+      
+      // Multiple glow layers for novel species
+      if (node.novelSpecies) {
+        ctx.shadowColor = 'hsl(184, 100%, 50%)';
+        ctx.shadowBlur = 20;
+        ctx.fill();
+        
+        // Secondary glow
+        ctx.beginPath();
+        ctx.arc(x, y, radius * 1.5, 0, 2 * Math.PI);
+        ctx.fillStyle = `hsl(184, 100%, 50%, 0.2)`;
+        ctx.fill();
+        
+        ctx.shadowBlur = 0;
+      }
+
+      // Inner core
+      ctx.beginPath();
+      ctx.arc(x, y, radius * 0.6, 0, 2 * Math.PI);
+      ctx.fillStyle = 'hsl(var(--foreground))';
+      ctx.fill();
+
+      // Confidence indicator ring
+      if (node.confidence) {
+        ctx.beginPath();
+        ctx.arc(x, y, radius + 3, 0, (node.confidence / 100) * 2 * Math.PI);
+        ctx.strokeStyle = `hsl(158, 100%, 40%, 0.8)`;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      // Enhanced label with background
+      ctx.fillStyle = 'hsla(220, 100%, 4%, 0.8)';
+      ctx.fillRect(x + radius + 8, y - 10, ctx.measureText(node.name).width + 8, 20);
+      
+      ctx.fillStyle = 'hsl(var(--foreground))';
+      ctx.font = `${node.novelSpecies ? 'bold' : 'normal'} ${12 + level * 2}px 'Inter', sans-serif`;
+      ctx.fillText(node.name, x + radius + 12, y + 4);
+
+      // Sequence count indicator
+      if (node.sequenceCount) {
+        const countText = `${node.sequenceCount}`;
+        ctx.fillStyle = `hsl(184, 100%, 50%, 0.8)`;
+        ctx.font = '10px Inter';
+        ctx.fillText(countText, x - ctx.measureText(countText).width / 2, y + radius + 15);
       }
     };
 
-    // Start drawing from root
-    drawNode(treeData, 50, canvas.offsetHeight / 2, 0);
+    // Start drawing from root with animation
+    const animationProgress = isAnimating ? Math.min(1, (time % 2000) / 2000) : 1;
+    drawNode(treeData, 60, canvas.offsetHeight / 2, 0, animationProgress);
+    
+    ctx.restore();
+
+    // Continue animation if playing
+    if (isPlaying) {
+      animationRef.current = requestAnimationFrame(drawTree);
+    }
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsAnimating(true);
+    if (isPlaying) {
+      animationRef.current = requestAnimationFrame(drawTree);
+    } else {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
       drawTree();
-      setTimeout(() => setIsAnimating(false), 1000);
-    }, 500);
+    }
 
-    return () => clearTimeout(timer);
-  }, [zoomLevel]);
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [zoomLevel, isPlaying]);
+
+  const toggleAnimation = () => {
+    setIsPlaying(!isPlaying);
+  };
 
   const animateGrowth = () => {
     setIsAnimating(true);
@@ -217,8 +324,11 @@ const PhylogeneticTree: React.FC = () => {
   };
 
   return (
-    <section id="phylogeny" className="py-20 px-6">
-      <div className="container mx-auto">
+    <section id="phylogeny" className="py-20 px-6 relative">
+      {/* Ocean Life Background */}
+      <OceanLifeBackground />
+      
+      <div className="container mx-auto relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-6xl font-orbitron font-bold mb-6">
@@ -271,6 +381,18 @@ const PhylogeneticTree: React.FC = () => {
                       className="border-bio-green/30 text-bio-green hover:bg-bio-green/10"
                     >
                       <Dna className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={toggleAnimation}
+                      className={`${
+                        isPlaying 
+                          ? 'border-bio-cyan/30 text-bio-cyan hover:bg-bio-cyan/10' 
+                          : 'border-muted/30 text-muted hover:bg-muted/10'
+                      }`}
+                    >
+                      {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                     </Button>
                   </div>
                 </div>
