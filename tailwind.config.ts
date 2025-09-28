@@ -47,6 +47,19 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Deep Sea Color Palette
+        ocean: {
+          depth: "hsl(var(--ocean-depth))",
+          dark: "hsl(var(--ocean-dark))",
+          medium: "hsl(var(--ocean-medium))",
+          surface: "hsl(var(--ocean-surface))",
+        },
+        bio: {
+          cyan: "hsl(var(--bio-cyan))",
+          teal: "hsl(var(--bio-teal))",
+          green: "hsl(var(--bio-green))",
+          blue: "hsl(var(--bio-blue))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -57,6 +70,22 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+      },
+      fontFamily: {
+        orbitron: ["Orbitron", "monospace"],
+        inter: ["Inter", "sans-serif"],
+      },
+      backgroundImage: {
+        "gradient-ocean": "var(--gradient-ocean)",
+        "gradient-bio": "var(--gradient-bio)",
+        "gradient-depth": "var(--gradient-depth)",
+      },
+      boxShadow: {
+        "bio-glow": "var(--bio-glow)",
+        "glass": "var(--glass-shadow)",
+      },
+      filter: {
+        "particle-glow": "var(--particle-glow)",
       },
       borderRadius: {
         lg: "var(--radius)",
