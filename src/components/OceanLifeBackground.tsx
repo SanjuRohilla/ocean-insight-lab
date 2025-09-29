@@ -258,7 +258,7 @@ const OceanLifeBackground: React.FC = () => {
       ))}
 
       {/* Keyframes */}
-      <style jsx global>{`
+      <style>{`
         @keyframes drift-right {
           0% {
             transform: translateX(-20vw);
