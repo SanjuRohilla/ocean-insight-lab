@@ -191,26 +191,34 @@ const OceanLifeBackground: React.FC = () => {
 
   useEffect(() => {
     const imgs = [fish1, fish2, fish3, fish4, fish5, fish6];
-    const newEls: FloatingElement[] = Array.from({ length: 20 }, (_, i) => {
+    const newEls: FloatingElement[] = Array.from({ length: 12 }, (_, i) => {
       const src = imgs[Math.floor(Math.random() * imgs.length)];
+      // Better distribution to avoid overlap
+      const gridX = (i % 4) * 25 + Math.random() * 20; // Grid-based with randomness
+      const gridY = Math.floor(i / 4) * 33 + Math.random() * 25;
+      
       return {
         id: i,
         src,
-        x: Math.random() * 90, // full width
-        y: Math.random() * 90, // full height
-        size: Math.random() * 150 + 80, // 80–230px
-        speed: Math.random() * 25 + 20, // 20–45s
-        opacity: Math.random() * 0.4 + 0.6, // 0.6–1
-        animationDelay: Math.random() * 10,
+        x: gridX,
+        y: gridY,
+        size: Math.random() * 100 + 60, // Smaller size: 60–160px
+        speed: Math.random() * 20 + 25, // Slower: 25–45s
+        opacity: Math.random() * 0.3 + 0.4, // More transparent: 0.4–0.7
+        animationDelay: Math.random() * 15, // More staggered
         direction: i % 2 === 0 ? "right" : "left",
-        zIndex: Math.random() > 0.5 ? 5 : 1, // some in front, some behind
+        zIndex: Math.random() > 0.5 ? 2 : 1, // Lower z-index
       };
     });
     setElements(newEls);
   }, []);
 
   return (
-    <div className="absolute top-0 left-0 w-full h-screen overflow-hidden pointer-events-none bg-gradient-to-b from-sky-900 via-sky-950 to-black">
+    <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+      {/* Ocean gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-blue-900/30 via-blue-950/20 to-teal-900/30"></div>
+      
+      {/* Fish elements with better spacing */}
       {elements.map((el) => (
         <div
           key={el.id}
@@ -223,7 +231,8 @@ const OceanLifeBackground: React.FC = () => {
             top: `${el.y}%`,
             left: `${el.x}%`,
             width: `${el.size}px`,
-            opacity: el.opacity,
+            height: `${el.size * 0.7}px`, // Maintain aspect ratio
+            opacity: el.opacity * 0.7, // Reduce opacity for subtlety
             animationDuration: `${el.speed}s`,
             animationDelay: `${el.animationDelay}s`,
             zIndex: el.zIndex,
@@ -231,28 +240,27 @@ const OceanLifeBackground: React.FC = () => {
         >
           <img
             src={el.src}
-            alt="fish"
-            className="w-full h-full object-cover rounded-[50%]"
+            alt="marine life"
+            className="w-full h-full object-cover rounded-lg"
             style={{
-              filter:
-                "drop-shadow(0px 0px 12px rgba(0,200,255,0.3)) brightness(0.95) contrast(1.2) saturate(1.2)",
+              filter: "drop-shadow(0px 0px 8px rgba(0,200,255,0.2)) brightness(0.9) contrast(1.1) saturate(1.1) blur(0.5px)",
             }}
           />
         </div>
       ))}
 
-      {/* Floating bubbles */}
-      {Array.from({ length: 25 }, (_, i) => (
+      {/* Floating bubbles with better distribution */}
+      {Array.from({ length: 15 }, (_, i) => (
         <div
           key={`bubble-${i}`}
-          className="absolute rounded-full bg-cyan-200/20 animate-bubble"
+          className="absolute rounded-full bg-cyan-200/10 animate-bubble"
           style={{
             left: `${Math.random() * 100}%`,
             top: `${Math.random() * 100}%`,
-            width: `${Math.random() * 8 + 4}px`,
-            height: `${Math.random() * 8 + 4}px`,
-            animationDuration: `${Math.random() * 10 + 6}s`,
-            animationDelay: `${Math.random() * 6}s`,
+            width: `${Math.random() * 6 + 3}px`,
+            height: `${Math.random() * 6 + 3}px`,
+            animationDuration: `${Math.random() * 12 + 8}s`,
+            animationDelay: `${Math.random() * 8}s`,
           }}
         />
       ))}

@@ -11,8 +11,11 @@ import {
   Info,
   Dna,
   Play,
-  Pause
+  Pause,
+  Download
 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import jsPDF from 'jspdf';
 // import OceanLifeBackground from './OceanLifeBackground';
 
 interface TreeNode {
@@ -32,6 +35,51 @@ const PhylogeneticTree: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(true);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>();
+  const { toast } = useToast();
+
+  const generateTreePDF = () => {
+    const doc = new jsPDF();
+    
+    // Title
+    doc.setFontSize(20);
+    doc.text('Phylogenetic Tree Analysis Report', 20, 30);
+    
+    // Date
+    doc.setFontSize(12);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 45);
+    
+    // Tree Statistics
+    doc.setFontSize(16);
+    doc.text('Tree Statistics', 20, 65);
+    doc.setFontSize(12);
+    doc.text('Total Taxa: 1,247', 20, 80);
+    doc.text('Novel Species: 23', 20, 95);
+    doc.text('Average Confidence: 95.2%', 20, 110);
+    doc.text('Maximum Depth: 8 levels', 20, 125);
+    
+    // Methodology
+    doc.setFontSize(16);
+    doc.text('Phylogenetic Analysis', 20, 150);
+    doc.setFontSize(10);
+    doc.text('The phylogenetic tree was constructed using environmental DNA sequences', 20, 165);
+    doc.text('from marine samples. Advanced algorithms were employed for taxonomic', 20, 175);
+    doc.text('classification and evolutionary relationship determination.', 20, 185);
+    
+    // Novel Species Section
+    doc.setFontSize(14);
+    doc.text('Novel Species Discoveries', 20, 210);
+    doc.setFontSize(10);
+    doc.text('• Methanobrevibacter sp. nov. - Confidence: 86%', 30, 225);
+    doc.text('• Multiple unclassified bacterial species identified', 30, 235);
+    doc.text('• Potential new archaeal lineages discovered', 30, 245);
+    
+    doc.save('phylogenetic-tree-report.pdf');
+    
+    toast({
+      title: "PDF Generated",
+      description: "Phylogenetic tree report has been downloaded.",
+    });
+  };
 
   // Mock phylogenetic data
   const treeData: TreeNode = {
@@ -265,13 +313,28 @@ const PhylogeneticTree: React.FC = () => {
         ctx.stroke();
       }
 
-      // Enhanced label with background
-      ctx.fillStyle = 'hsla(220, 100%, 4%, 0.8)';
-      ctx.fillRect(x + radius + 8, y - 10, ctx.measureText(node.name).width + 8, 20);
-      
-      ctx.fillStyle = 'hsl(var(--foreground))';
+      // Enhanced label with better visibility
       ctx.font = `${node.novelSpecies ? 'bold' : 'normal'} ${12 + level * 2}px 'Inter', sans-serif`;
+      const textMetrics = ctx.measureText(node.name);
+      const textWidth = textMetrics.width;
+      
+      // Dark background for text readability
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      ctx.fillRect(x + radius + 6, y - 12, textWidth + 12, 24);
+      
+      // White border for contrast
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x + radius + 6, y - 12, textWidth + 12, 24);
+      
+      // White text for maximum visibility
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+      ctx.shadowOffsetX = 1;
+      ctx.shadowOffsetY = 1;
+      ctx.shadowBlur = 2;
       ctx.fillText(node.name, x + radius + 12, y + 4);
+      ctx.shadowBlur = 0;
 
       // Sequence count indicator
       if (node.sequenceCount) {
@@ -393,6 +456,14 @@ const PhylogeneticTree: React.FC = () => {
                       }`}
                     >
                       {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={generateTreePDF}
+                      className="border-bio-green/30 text-bio-green hover:bg-bio-green/10"
+                    >
+                      <Download className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>

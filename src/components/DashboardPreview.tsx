@@ -12,13 +12,62 @@ import {
   Database,
   ArrowRight,
   FileText,
-  Microscope
+  Microscope,
+  Download
 } from 'lucide-react';
 import dashboardImage from '@/assets/dashboard-visualization.jpg';
 import OceanLifeBackground from './OceanLifeBackground';
+import FileUpload from './FileUpload';
+import { useToast } from '@/hooks/use-toast';
+import jsPDF from 'jspdf';
 const DashboardPreview: React.FC = () => {
   const [activeTab, setActiveTab] = useState('upload');
   const [progress, setProgress] = useState(0);
+  const { toast } = useToast();
+
+  const generatePDFReport = () => {
+    const doc = new jsPDF();
+    
+    // Title
+    doc.setFontSize(20);
+    doc.text('eDNA Analysis Report', 20, 30);
+    
+    // Date
+    doc.setFontSize(12);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 45);
+    
+    // Summary Statistics
+    doc.setFontSize(16);
+    doc.text('Summary Statistics', 20, 65);
+    doc.setFontSize(12);
+    doc.text('Taxa Identified: 1,247', 20, 80);
+    doc.text('Novel Species: 23', 20, 95);
+    doc.text('Sequences Processed: 45.2K', 20, 110);
+    doc.text('Accuracy Rate: 97.8%', 20, 125);
+    
+    // Taxonomic Distribution
+    doc.setFontSize(16);
+    doc.text('Taxonomic Distribution', 20, 150);
+    doc.setFontSize(12);
+    taxonomyData.forEach((item, index) => {
+      doc.text(`${item.kingdom}: ${item.count} species (${item.percentage}%)`, 20, 165 + (index * 15));
+    });
+    
+    // Methodology
+    doc.setFontSize(16);
+    doc.text('Methodology', 20, 230);
+    doc.setFontSize(10);
+    doc.text('Environmental DNA (eDNA) sequences were processed using advanced AI algorithms.', 20, 245);
+    doc.text('Quality control, sequence alignment, and taxonomic classification were performed', 20, 255);
+    doc.text('using NCBI GenBank marine database with 97% similarity threshold.', 20, 265);
+    
+    doc.save('edna-analysis-report.pdf');
+    
+    toast({
+      title: "PDF Generated",
+      description: "Your eDNA analysis report has been downloaded.",
+    });
+  };
 
   // Simulate AI processing
   React.useEffect(() => {
@@ -91,84 +140,59 @@ const DashboardPreview: React.FC = () => {
 
           {/* Upload Tab */}
           {activeTab === 'upload' && (
-            <div className="grid md:grid-cols-2 gap-8 animate-fade-in">
-              <Card className="glass-card hover-glass">
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Upload className="w-5 h-5 text-bio-cyan" />
-                    <span>Upload eDNA Files</span>
-                  </CardTitle>
-                  <CardDescription>
-                    Support for FASTA, FASTQ, and CSV formats
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="border-2 border-dashed border-bio-cyan/30 rounded-lg p-8 text-center hover:border-bio-cyan/50 transition-colors">
-                    <Upload className="w-12 h-12 text-bio-cyan mx-auto mb-4" />
-                    <p className="text-muted-foreground mb-2">Drag & drop your files here</p>
-                    <Button variant="outline" className="border-bio-cyan text-bio-cyan">
-                      Browse Files
-                    </Button>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>sample_ocean_edna.fastq</span>
-                      <Badge variant="secondary">Ready</Badge>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>metadata_coordinates.csv</span>
-                      <Badge variant="secondary">Ready</Badge>
-                    </div>
-                  </div>
-                  <Button 
-                    className="w-full bg-gradient-bio text-ocean-depth"
-                    onClick={() => setActiveTab('processing')}
-                  >
-                    Start AI Analysis
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </CardContent>
-              </Card>
+            <div className="grid md:grid-cols-3 gap-8 animate-fade-in">
+              <div className="md:col-span-2">
+                <FileUpload />
+              </div>
 
-              <Card className="glass-card">
-                <CardHeader>
-                  <CardTitle>Pipeline Configuration</CardTitle>
-                  <CardDescription>
-                    Customize your analysis parameters
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Database Reference</label>
-                    <select className="w-full p-2 rounded-lg bg-ocean-surface border border-white/20">
-                      <option>NCBI GenBank (Marine)</option>
-                      <option>SILVA rRNA Database</option>
-                      <option>PR2 Protist Database</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Similarity Threshold</label>
-                    <input 
-                      type="range" 
-                      min="80" 
-                      max="100" 
-                      defaultValue="97" 
-                      className="w-full"
-                    />
-                    <span className="text-xs text-muted-foreground">97% similarity</span>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Target Organisms</label>
-                    <div className="flex flex-wrap gap-2">
-                      {['Bacteria', 'Fish', 'Plankton', 'Coral', 'All'].map((org) => (
-                        <Badge key={org} variant="outline" className="cursor-pointer hover:bg-bio-cyan/20">
-                          {org}
-                        </Badge>
-                      ))}
+              <div>
+                <Card className="glass-card h-fit">
+                  <CardHeader>
+                    <CardTitle>Pipeline Configuration</CardTitle>
+                    <CardDescription>
+                      Customize your analysis parameters
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Database Reference</label>
+                      <select className="w-full p-2 rounded-lg bg-ocean-surface border border-white/20">
+                        <option>NCBI GenBank (Marine)</option>
+                        <option>SILVA rRNA Database</option>
+                        <option>PR2 Protist Database</option>
+                      </select>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Similarity Threshold</label>
+                      <input 
+                        type="range" 
+                        min="80" 
+                        max="100" 
+                        defaultValue="97" 
+                        className="w-full"
+                      />
+                      <span className="text-xs text-muted-foreground">97% similarity</span>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Target Organisms</label>
+                      <div className="flex flex-wrap gap-2">
+                        {['Bacteria', 'Fish', 'Plankton', 'Coral', 'All'].map((org) => (
+                          <Badge key={org} variant="outline" className="cursor-pointer hover:bg-bio-cyan/20">
+                            {org}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                    <Button 
+                      className="w-full bg-gradient-bio text-ocean-depth mt-4"
+                      onClick={() => setActiveTab('processing')}
+                    >
+                      Start AI Analysis
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           )}
 
@@ -264,6 +288,17 @@ const DashboardPreview: React.FC = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Download Report Button */}
+              <div className="flex justify-center mt-8">
+                <Button 
+                  onClick={generatePDFReport}
+                  className="bg-gradient-to-r from-bio-green to-bio-teal text-ocean-depth px-8 py-3 text-lg font-semibold"
+                >
+                  <Download className="w-5 h-5 mr-2" />
+                  Download PDF Report
+                </Button>
+              </div>
             </div>
           )}
         </div>
