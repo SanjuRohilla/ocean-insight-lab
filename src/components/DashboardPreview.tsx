@@ -15,7 +15,7 @@ import {
   Microscope
 } from 'lucide-react';
 import dashboardImage from '@/assets/dashboard-visualization.jpg';
-
+import OceanLifeBackground from './OceanLifeBackground';
 const DashboardPreview: React.FC = () => {
   const [activeTab, setActiveTab] = useState('upload');
   const [progress, setProgress] = useState(0);
@@ -51,7 +51,8 @@ const DashboardPreview: React.FC = () => {
   ];
 
   return (
-    <section id="dashboard" className="py-20 px-6">
+    <section id="dashboard" className="py-20 px-6 h-30">
+      <OceanLifeBackground/>
       <div className="container mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">

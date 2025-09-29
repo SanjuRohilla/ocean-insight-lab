@@ -13,7 +13,7 @@ import {
   Play,
   Pause
 } from 'lucide-react';
-import OceanLifeBackground from './OceanLifeBackground';
+// import OceanLifeBackground from './OceanLifeBackground';
 
 interface TreeNode {
   id: string;
@@ -326,7 +326,7 @@ const PhylogeneticTree: React.FC = () => {
   return (
     <section id="phylogeny" className="py-20 px-6 relative">
       {/* Ocean Life Background */}
-      <OceanLifeBackground />
+      {/* <OceanLifeBackground /> */}
       
       <div className="container mx-auto relative z-10">
         {/* Section Header */}
