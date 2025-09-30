@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -242,6 +243,25 @@ const DashboardPreview: React.FC = () => {
           {/* Results Tab */}
           {activeTab === 'results' && (
             <div className="space-y-8 animate-fade-in">
+              {/* Dashboard Visualization */}
+              <Card className="glass-card overflow-hidden">
+                <CardHeader>
+                  <CardTitle>AI Analysis Dashboard</CardTitle>
+                  <CardDescription>
+                    Comprehensive visualization of eDNA sequence analysis
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <AspectRatio ratio={16 / 9}>
+                    <img 
+                      src={dashboardImage} 
+                      alt="eDNA Analysis Dashboard showing phylogenetic tree and biodiversity metrics" 
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  </AspectRatio>
+                </CardContent>
+              </Card>
+
               {/* Stats Cards */}
               <div className="grid md:grid-cols-4 gap-6">
                 {stats.map((stat) => (
