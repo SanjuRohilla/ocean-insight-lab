@@ -1,9 +1,18 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Dna, Waves, BarChart3, TreePine } from 'lucide-react';
+import { Menu, X, Dna, Waves, BarChart3, TreePine, FolderOpen, LogOut } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 const Navigation: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/auth');
+  };
 
   const navItems = [
     { name: 'eDNA Analytics', href: '#dashboard', icon: Dna },
@@ -41,9 +50,32 @@ const Navigation: React.FC = () => {
                 <span className="font-inter font-medium">{item.name}</span>
               </a>
             ))}
-            <Button variant="default" className="bg-gradient-bio text-ocean-depth font-semibold hover-bio">
-              Get Started
-            </Button>
+            {user && (
+              <>
+                <Link to="/projects">
+                  <Button variant="ghost" className="flex items-center space-x-2">
+                    <FolderOpen className="w-4 h-4" />
+                    <span>Projects</span>
+                  </Button>
+                </Link>
+                <Button 
+                  variant="ghost" 
+                  onClick={handleSignOut}
+                  className="flex items-center space-x-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Sign Out</span>
+                </Button>
+              </>
+            )}
+            {!user && (
+              <Button 
+                onClick={() => navigate('/auth')}
+                className="bg-gradient-bio text-ocean-depth font-semibold hover-bio"
+              >
+                Sign In
+              </Button>
+            )}
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -71,9 +103,31 @@ const Navigation: React.FC = () => {
                 <span className="font-inter font-medium">{item.name}</span>
               </a>
             ))}
-            <Button className="w-full bg-gradient-bio text-ocean-depth font-semibold">
-              Get Started
-            </Button>
+            {user ? (
+              <>
+                <Link to="/projects" onClick={() => setIsOpen(false)}>
+                  <Button className="w-full flex items-center justify-center space-x-2 glass-card">
+                    <FolderOpen className="w-5 h-5" />
+                    <span>Projects</span>
+                  </Button>
+                </Link>
+                <Button 
+                  onClick={() => { handleSignOut(); setIsOpen(false); }}
+                  className="w-full flex items-center justify-center space-x-2"
+                  variant="outline"
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span>Sign Out</span>
+                </Button>
+              </>
+            ) : (
+              <Button 
+                onClick={() => { navigate('/auth'); setIsOpen(false); }}
+                className="w-full bg-gradient-bio text-ocean-depth font-semibold"
+              >
+                Sign In
+              </Button>
+            )}
           </div>
         )}
       </div>

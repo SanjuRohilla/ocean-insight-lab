@@ -1,1 +1,7 @@
 project_id = "hnzbzitcwktnianxkykt"
+
+[functions.analyze-sequences]
+verify_jwt = true
+
+[functions.process-file-upload]
+verify_jwt = true
