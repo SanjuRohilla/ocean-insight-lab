@@ -14,7 +14,277 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      analysis_results: {
+        Row: {
+          accuracy_rate: number | null
+          created_at: string
+          id: string
+          novel_species_count: number | null
+          processing_time_seconds: number | null
+          project_id: string
+          sequences_processed: number | null
+          summary: Json | null
+          taxa_count: number | null
+          user_id: string
+        }
+        Insert: {
+          accuracy_rate?: number | null
+          created_at?: string
+          id?: string
+          novel_species_count?: number | null
+          processing_time_seconds?: number | null
+          project_id: string
+          sequences_processed?: number | null
+          summary?: Json | null
+          taxa_count?: number | null
+          user_id: string
+        }
+        Update: {
+          accuracy_rate?: number | null
+          created_at?: string
+          id?: string
+          novel_species_count?: number | null
+          processing_time_seconds?: number | null
+          project_id?: string
+          sequences_processed?: number | null
+          summary?: Json | null
+          taxa_count?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analysis_results_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analysis_results_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          organization: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          organization?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          organization?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      projects: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projects_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sequences: {
+        Row: {
+          analysis_id: string | null
+          created_at: string
+          file_id: string
+          id: string
+          length: number | null
+          metadata: Json | null
+          quality_score: number | null
+          sequence_data: string
+        }
+        Insert: {
+          analysis_id?: string | null
+          created_at?: string
+          file_id: string
+          id?: string
+          length?: number | null
+          metadata?: Json | null
+          quality_score?: number | null
+          sequence_data: string
+        }
+        Update: {
+          analysis_id?: string | null
+          created_at?: string
+          file_id?: string
+          id?: string
+          length?: number | null
+          metadata?: Json | null
+          quality_score?: number | null
+          sequence_data?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sequences_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "analysis_results"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sequences_file_id_fkey"
+            columns: ["file_id"]
+            isOneToOne: false
+            referencedRelation: "uploaded_files"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      taxa_identified: {
+        Row: {
+          analysis_id: string
+          class: string | null
+          confidence_score: number | null
+          created_at: string
+          family: string | null
+          genus: string | null
+          id: string
+          is_novel: boolean | null
+          kingdom: string
+          order_name: string | null
+          phylum: string | null
+          sequence_count: number | null
+          species: string | null
+        }
+        Insert: {
+          analysis_id: string
+          class?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          family?: string | null
+          genus?: string | null
+          id?: string
+          is_novel?: boolean | null
+          kingdom: string
+          order_name?: string | null
+          phylum?: string | null
+          sequence_count?: number | null
+          species?: string | null
+        }
+        Update: {
+          analysis_id?: string
+          class?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          family?: string | null
+          genus?: string | null
+          id?: string
+          is_novel?: boolean | null
+          kingdom?: string
+          order_name?: string | null
+          phylum?: string | null
+          sequence_count?: number | null
+          species?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "taxa_identified_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "analysis_results"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      uploaded_files: {
+        Row: {
+          file_name: string
+          file_size: number
+          file_type: string
+          id: string
+          project_id: string
+          storage_path: string
+          uploaded_at: string
+          user_id: string
+        }
+        Insert: {
+          file_name: string
+          file_size: number
+          file_type: string
+          id?: string
+          project_id: string
+          storage_path: string
+          uploaded_at?: string
+          user_id: string
+        }
+        Update: {
+          file_name?: string
+          file_size?: number
+          file_type?: string
+          id?: string
+          project_id?: string
+          storage_path?: string
+          uploaded_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uploaded_files_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "uploaded_files_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
