@@ -11,6 +11,7 @@ const Hero: React.FC = () => {
       <video
         autoPlay
         loop
+        muted
         playsInline
         preload="auto"
         className="absolute inset-0 w-full h-full object-cover"
