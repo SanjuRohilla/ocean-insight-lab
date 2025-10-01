@@ -2,18 +2,22 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowDown, Play, Download } from 'lucide-react';
 import DNAHelix from './DNAHelix';
-import heroImage from '@/assets/hero-marine-ecosystem.jpg';
+import heroVideo from '@/assets/hero-background.mp4';
 
 const Hero: React.FC = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Image with Overlay */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${heroImage})` }}
+      {/* Background Video with Overlay */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-ocean-depth/60 via-ocean-dark/80 to-ocean-depth/90"></div>
-      </div>
+        <source src={heroVideo} type="video/mp4" />
+      </video>
+      <div className="absolute inset-0 bg-gradient-to-b from-ocean-depth/60 via-ocean-dark/80 to-ocean-depth/90"></div>
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-6 text-center">
