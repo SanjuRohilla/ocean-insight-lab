@@ -12,11 +12,12 @@ const Hero: React.FC = () => {
         autoPlay
         loop
         playsInline
+        preload="auto"
         className="absolute inset-0 w-full h-full object-cover"
       >
         <source src={heroVideo} type="video/mp4" />
       </video>
-      <div className="absolute inset-0 bg-gradient-to-b from-ocean-depth/20 via-ocean-dark/30 to-ocean-depth/40"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-ocean-depth/10 via-ocean-dark/20 to-ocean-depth/30"></div>
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-6 text-center">
