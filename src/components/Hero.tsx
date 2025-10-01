@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowDown, Play, Download } from 'lucide-react';
 import DNAHelix from './DNAHelix';
 import heroVideo from '@/assets/hero-background.mp4';
+import heroPoster from '@/assets/hero-marine-ecosystem.jpg';
 
 const Hero: React.FC = () => {
   return (
@@ -14,14 +15,12 @@ const Hero: React.FC = () => {
         muted
         playsInline
         preload="auto"
-        disablePictureInPicture
-        disableRemotePlayback
-        className="absolute inset-0 w-full h-full object-cover will-change-transform"
-        style={{ transform: 'translateZ(0)' }}
+        poster={heroPoster}
+        className="absolute inset-0 w-full h-full object-cover"
       >
         <source src={heroVideo} type="video/mp4" />
       </video>
-      <div className="absolute inset-0 bg-gradient-to-b from-ocean-depth/10 via-ocean-dark/20 to-ocean-depth/30" style={{ transform: 'translateZ(0)' }}></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-ocean-depth/10 via-ocean-dark/20 to-ocean-depth/30"></div>
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-6 text-center">
