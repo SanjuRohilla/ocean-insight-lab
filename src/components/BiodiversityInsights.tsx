@@ -62,37 +62,36 @@ const BiodiversityInsights: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Load Voiceflow chatbot
+  // Load Voiceflow chatbot with voice support
   useEffect(() => {
     if (voiceflowLoaded.current) return;
     voiceflowLoaded.current = true;
 
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.onload = () => {
-      if (window.voiceflow) {
-        window.voiceflow.chat.load({
-          verify: { projectID: '68de1ef55427f87add0e664b' },
-          url: 'https://general-runtime.voiceflow.com',
-          versionID: 'production',
-          voice: {
-            url: "https://runtime-api.voiceflow.com"
-          },
-          render: {
-            mode: 'embedded',
-            target: document.getElementById('voiceflow-chat')
-          }
-        });
+    (function(d, t) {
+      const v = d.createElement(t) as HTMLScriptElement;
+      const s = d.getElementsByTagName(t)[0];
+      v.onload = function() {
+        if (window.voiceflow) {
+          window.voiceflow.chat.load({
+            verify: { projectID: '68de1ef55427f87add0e664b' },
+            url: 'https://general-runtime.voiceflow.com',
+            versionID: 'production',
+            voice: {
+              url: "https://runtime-api.voiceflow.com"
+            },
+            render: {
+              mode: 'embedded',
+              target: document.getElementById('voiceflow-chat')
+            }
+          });
+        }
+      };
+      v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs";
+      v.type = "text/javascript";
+      if (s.parentNode) {
+        s.parentNode.insertBefore(v, s);
       }
-    };
-    script.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs";
-    document.head.appendChild(script);
-
-    return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-    };
+    })(document, 'script');
   }, []);
 
   const ecosystemMetrics = [
@@ -340,22 +339,30 @@ const BiodiversityInsights: React.FC = () => {
           {/* AI Chat Interface with Voiceflow */}
           <Card className="glass-card overflow-hidden">
             <CardHeader className="border-b border-bio-cyan/20 bg-gradient-to-r from-bio-cyan/5 to-bio-teal/5">
-              <CardTitle className="flex items-center space-x-3">
-                <div className="p-2 rounded-lg bg-bio-cyan/10 border border-bio-cyan/30">
-                  <Users className="w-6 h-6 text-bio-cyan" />
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 rounded-lg bg-bio-cyan/10 border border-bio-cyan/30">
+                    <Users className="w-6 h-6 text-bio-cyan" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-orbitron bio-text">AI Marine Researcher</h3>
+                    <p className="text-sm text-muted-foreground font-normal mt-1">
+                      Powered by advanced biodiversity analysis
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-2xl font-orbitron bio-text">AI Marine Researcher</h3>
-                  <p className="text-sm text-muted-foreground font-normal mt-1">
-                    Powered by advanced biodiversity analysis
-                  </p>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-bio-cyan border-bio-cyan/30 flex items-center gap-1">
+                    <Activity className="w-3 h-3" />
+                    Voice Active
+                  </Badge>
                 </div>
               </CardTitle>
               <CardDescription className="mt-4 flex items-start space-x-2">
                 <div className="w-1 h-12 bg-bio-cyan/50 rounded-full" />
                 <div>
                   <p className="text-base">
-                    Ask questions about marine biodiversity patterns, species discoveries, conservation status, and ecosystem insights
+                    Ask questions using text or voice about marine biodiversity patterns, species discoveries, conservation status, and ecosystem insights
                   </p>
                   <div className="flex gap-2 mt-3">
                     <Badge variant="outline" className="text-bio-cyan border-bio-cyan/30">
