@@ -338,18 +338,47 @@ const BiodiversityInsights: React.FC = () => {
           </Card>
 
           {/* AI Chat Interface with Voiceflow */}
-          <Card className="glass-card">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Users className="w-5 h-5 text-bio-cyan" />
-                <span>Ask the AI Researcher</span>
+          <Card className="glass-card overflow-hidden">
+            <CardHeader className="border-b border-bio-cyan/20 bg-gradient-to-r from-bio-cyan/5 to-bio-teal/5">
+              <CardTitle className="flex items-center space-x-3">
+                <div className="p-2 rounded-lg bg-bio-cyan/10 border border-bio-cyan/30">
+                  <Users className="w-6 h-6 text-bio-cyan" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-orbitron bio-text">AI Marine Researcher</h3>
+                  <p className="text-sm text-muted-foreground font-normal mt-1">
+                    Powered by advanced biodiversity analysis
+                  </p>
+                </div>
               </CardTitle>
-              <CardDescription>
-                Query our AI system about marine biodiversity patterns and discoveries using the chat widget below
+              <CardDescription className="mt-4 flex items-start space-x-2">
+                <div className="w-1 h-12 bg-bio-cyan/50 rounded-full" />
+                <div>
+                  <p className="text-base">
+                    Ask questions about marine biodiversity patterns, species discoveries, conservation status, and ecosystem insights
+                  </p>
+                  <div className="flex gap-2 mt-3">
+                    <Badge variant="outline" className="text-bio-cyan border-bio-cyan/30">
+                      Species ID
+                    </Badge>
+                    <Badge variant="outline" className="text-bio-teal border-bio-teal/30">
+                      Analysis
+                    </Badge>
+                    <Badge variant="outline" className="text-bio-green border-bio-green/30">
+                      Insights
+                    </Badge>
+                  </div>
+                </div>
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div id="voiceflow-chat" className="min-h-[500px] w-full glass-card rounded-lg" />
+            <CardContent className="p-0">
+              <div 
+                id="voiceflow-chat" 
+                className="min-h-[600px] w-full bg-gradient-to-b from-transparent to-bio-cyan/5" 
+                style={{
+                  background: 'linear-gradient(180deg, transparent 0%, hsl(var(--bio-cyan) / 0.03) 100%)'
+                }}
+              />
             </CardContent>
           </Card>
         </div>
