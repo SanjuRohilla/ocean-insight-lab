@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +13,12 @@ import {
   Target
 } from 'lucide-react';
 
+declare global {
+  interface Window {
+    voiceflow: any;
+  }
+}
+
 const BiodiversityInsights: React.FC = () => {
   const [animatedValues, setAnimatedValues] = useState({
     speciesRichness: 0,
@@ -20,6 +26,7 @@ const BiodiversityInsights: React.FC = () => {
     simpsonIndex: 0,
     evenness: 0,
   });
+  const voiceflowLoaded = useRef(false);
 
   const targetValues = {
     speciesRichness: 1247,
@@ -53,6 +60,35 @@ const BiodiversityInsights: React.FC = () => {
     }, stepDuration);
 
     return () => clearInterval(timer);
+  }, []);
+
+  // Load Voiceflow chatbot
+  useEffect(() => {
+    if (voiceflowLoaded.current) return;
+    voiceflowLoaded.current = true;
+
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.onload = () => {
+      if (window.voiceflow) {
+        window.voiceflow.chat.load({
+          verify: { projectID: '68de1ef55427f87add0e664b' },
+          url: 'https://general-runtime.voiceflow.com',
+          versionID: 'production',
+          voice: {
+            url: "https://runtime-api.voiceflow.com"
+          }
+        });
+      }
+    };
+    script.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs";
+    document.head.appendChild(script);
+
+    return () => {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    };
   }, []);
 
   const ecosystemMetrics = [
@@ -297,7 +333,7 @@ const BiodiversityInsights: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* AI Chat Interface Placeholder */}
+          {/* AI Chat Interface with Voiceflow */}
           <Card className="glass-card">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -305,30 +341,13 @@ const BiodiversityInsights: React.FC = () => {
                 <span>Ask the AI Researcher</span>
               </CardTitle>
               <CardDescription>
-                Query our AI system about marine biodiversity patterns and discoveries
+                Query our AI system about marine biodiversity patterns and discoveries using the chat widget below
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex space-x-2">
-                <input 
-                  type="text" 
-                  placeholder="e.g., Which organisms thrive near hydrothermal vents?"
-                  className="flex-1 p-3 rounded-lg bg-ocean-surface border border-white/20 focus:border-bio-cyan focus:outline-none"
-                />
-                <Button className="bg-gradient-bio text-ocean-depth px-6">
-                  Ask AI
-                </Button>
-              </div>
-              
-              <div className="p-4 glass-card">
-                <p className="text-sm text-muted-foreground mb-2">💡 Recent Query:</p>
-                <p className="font-medium mb-3">"What are the most abundant bacterial species at 2000m depth?"</p>
-                <p className="text-sm leading-relaxed">
-                  Based on the eDNA analysis, the most abundant bacterial species at 2000m depth are primarily 
-                  <span className="bio-text font-semibold"> Proteobacteria</span> (39% of sequences), particularly 
-                  <span className="bio-text font-semibold"> Gammaproteobacteria</span> which show exceptional adaptation 
-                  to high-pressure environments. These organisms demonstrate unique metabolic pathways for 
-                  chemosynthesis in deep-ocean conditions...
+            <CardContent>
+              <div className="p-4 glass-card text-center">
+                <p className="text-muted-foreground">
+                  Click the chat widget in the bottom right corner to start a conversation with our AI researcher
                 </p>
               </div>
             </CardContent>
