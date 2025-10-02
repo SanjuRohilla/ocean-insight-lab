@@ -77,6 +77,10 @@ const BiodiversityInsights: React.FC = () => {
           versionID: 'production',
           voice: {
             url: "https://runtime-api.voiceflow.com"
+          },
+          render: {
+            mode: 'embedded',
+            target: document.getElementById('voiceflow-chat')
           }
         });
       }
@@ -345,11 +349,7 @@ const BiodiversityInsights: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="p-4 glass-card text-center">
-                <p className="text-muted-foreground">
-                  Click the chat widget in the bottom right corner to start a conversation with our AI researcher
-                </p>
-              </div>
+              <div id="voiceflow-chat" className="min-h-[500px] w-full glass-card rounded-lg" />
             </CardContent>
           </Card>
         </div>
